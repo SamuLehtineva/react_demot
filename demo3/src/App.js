@@ -4,6 +4,8 @@ import './App.css';
 import axios from 'axios';
 
 import NewNotes from './components/NewNotes.js';
+import Notes from './components/Notes.js';
+import noteService from './Services/noteservice';
 
 function App() {
   const [notes, setnotes] = useState([]);
@@ -11,15 +13,11 @@ function App() {
   const [newImportance, setNewImportance] = useState(false);
 
   const getNotes = () => {
-  console.log("Starting effect");
-
-  axios
-  .get('http://localhost:3001/notes')
-  .then(response => {
+  noteService
+  .getAll()
+  .then(allNotes => {
     //const notes = response.data;
-    console.log(notes);
-    console.log("promise");
-    setnotes(response.data);
+    setnotes(allNotes);
   })
   };
 
@@ -34,15 +32,12 @@ const addNote = event => {
     date: Date.now(),
     important: newImportance
   };
-  axios
-  .post('http://localhost:3001/notes', testNote)
+  noteService.add(testNote)
   .then(response => {
-    let tempNotes = notes.concat(response.data);
+    let tempNotes = notes.concat(response);
     setnotes(tempNotes);
     setNewNote("");
     setNewImportance(false);
-    console.log(response)
-    console.log(notes);
   })
 }
 
@@ -63,7 +58,8 @@ const addNote = event => {
         </a>
         <NewNotes submitHandler={addNote} newNote={newNote} setNewNote={setNewNote} newImportance={newImportance} setNewImportance={setNewImportance}/>
         <button onClick={addNote}>Lisää juttu</button>
-        {notes.map(e => <li key = {e["id"]}>{e["content"]}</li>)}
+        {/* {notes.map(e => <li key = {e["id"]}>{e["content"]}</li>)} */}
+        <Notes mynotes={notes} setNotes={setnotes}/>
         
       </header>
       
